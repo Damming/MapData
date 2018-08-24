@@ -450,6 +450,11 @@
         args:
           chdir: /home/ubuntu/src/OldUnifont
           warn: no
+      
+      - name: make directory(2)
+        file: 
+          path: /usr/share/fonts/truetype/unifont
+          state: directory
             
       - name: copying file
         remote_src: yes
