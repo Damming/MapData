@@ -122,6 +122,8 @@
       - name: Refresh hosts file
         meta: refresh_inventory
 
+      - wait_for: delay=10
+
   - name: install openstreetmap
     hosts: webserver
     remote_user: ubuntu
@@ -450,6 +452,7 @@
           warn: no
             
       - name: copying file
+        remote_src: yes
         become: yes
         copy:
           src: /home/ubuntu/src/OldUnifont/unifont-5.1.20080914/font/precompiled/unifont.ttf
@@ -711,6 +714,7 @@
 
       # # Install renderd init script by copying the sample init script included in its package
       - name: install renderd(1)
+        remote_src: yes
         become: yes
         copy:
           src: /home/ubuntu/src/mod_tile/debian/renderd.init
