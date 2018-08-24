@@ -121,6 +121,8 @@
 
       - name: Refresh hosts file
         meta: refresh_inventory
+       
+      - wait_for: delay=10
 
   - name: install openstreetmap
     hosts: webserver
