@@ -838,4 +838,7 @@
         get_url: url=https://raw.githubusercontent.com/Damming/MapData/master/lf.html dest=/var/www/html/
       
       - name: Start renderd
-        shell: renderd -f -c /usr/local/etc/renderd.conf
+        service:
+          name: renderd
+          state: started
+        # shell: renderd -f -c /usr/local/etc/renderd.conf
