@@ -130,7 +130,7 @@
     gather_facts: True
     become_user: root
     become: true
-    
+    sudo: yes
     tags: provisioning
 
     vars:
