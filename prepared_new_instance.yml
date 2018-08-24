@@ -338,70 +338,87 @@
 
       # Install the fonts needed by openstreetmap-carto
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-emoji/fonts/NotoColorEmoji.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-emoji/fonts/NotoEmoji-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoNaskhArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoNaskhArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansAdlam-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansAdlamUnjoined-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansChakma-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansOsage-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSinhalaUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansCherokee-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSinhalaUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSymbols-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
       - copy:
+          remote_src: yes
           src: /home/ubuntu/src/noto-fonts/unhinted/NotoSansSymbols2-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
         become: yes
