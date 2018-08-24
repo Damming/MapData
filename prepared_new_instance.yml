@@ -121,8 +121,6 @@
 
       - name: Refresh hosts file
         meta: refresh_inventory
-       
-      - wait_for: delay=10
 
   - name: install openstreetmap
     hosts: webserver
@@ -130,7 +128,6 @@
     gather_facts: True
     become_user: root
     become: true
-    sudo: yes
     tags: provisioning
 
     vars:
