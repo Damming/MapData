@@ -159,6 +159,24 @@
       # ---------------- Yaozu Part ----------------
 
       # Set the en_GB locale
+      - name: generate language
+        become: yes
+        shell: locale-gen en_GB en_GB.UTF-8
+
+      - name: set LANG
+        become: yes
+        shell: update-locale LANG='en_GB.UTF-8'
+
+      - name: set LANGUAGE
+        become: yes
+        shell: update-locale LANGUAGE='en_GB.UTF-8'
+
+      - name: set LC_ALL
+        become: yes
+        shell: update-locale LC_ALL='en_GB.UTF-8'
+
+      - name: reload locale
+        shell: . /etc/default/locale
 
       - name: Install git
         become: yes
@@ -171,7 +189,7 @@
         become: true
         apt_repository: 
           repo: ppa:no1wantdthisname/ppa
-          state: latest
+          state: present
 
       - name: Install libfreetype6 & libfreetype6-dev
         become: yes
@@ -194,7 +212,7 @@
             - git
             - autoconf
             - libtool
-            - libxm12-dev
+            - libxml2-dev
             - libbz2-dev
             - libgeos-dev
             - libgeos++-dev
@@ -216,7 +234,7 @@
             - apache2 
             - apache2-dev
 
-      # Install Mod_tile from source
+      # Install Mod_tile from source #########CHANGE###########
       - name: Install necessary packages
         become: yes
         apt: 
@@ -228,8 +246,52 @@
             - autogen 
             - libmapnik3.0
 
-      - name: 
-
+      - name: make directory
+        file:
+          path: /home/ubuntu/src
+          state: directory
+          
+      - name: git clone
+        git:
+          repo: 'https://github.com/openstreetmap/mod_tile.git'
+          clone: yes
+          dest: /home/ubuntu/src/mod_tile
+        
+      - name: autogen and config
+        shell: ./autogen.sh
+        args:
+          chdir: /home/ubuntu/src/mod_tile 
+        
+      - name: Configure mod_tile.
+        shell: ./configure
+        args:
+          chdir: /home/ubuntu/src/mod_tile
+        
+      - name: make mod_tile
+        shell: make
+        args:
+          chdir: /home/ubuntu/src/mod_tile 
+        
+      - name: make install
+        become: yes
+        shell: make install
+        args:
+          chdir: /home/ubuntu/src/mod_tile
+        
+      - name: make install (2)
+        become: yes
+        shell: make install-mod_tile
+        args:
+          chdir: /home/ubuntu/src/mod_tile  
+        
+      - name: make install (3)
+        become: yes
+        shell: ldconfig
+        args:
+          chdir: /home/ubuntu/src/mod_tile  
+        
+        
+      # Install Yaml and Package Manager for Python
       - name: Install Yaml and Package Manager for Python & Mapnik Utilities
         become: yes
         apt: 
@@ -242,6 +304,11 @@
             - mapnik-utils
 
       # Install openstreetmap-carto
+      - name: git openstreetmap-carto
+        git:
+          repo: 'https://github.com/gravitystorm/openstreetmap-carto.git'
+          clone: yes
+          dest: /home/ubuntu/src/openstreetmap-carto
 
       # Install the fonts needed by openstreetmap-carto
       - name: Install font tools
@@ -256,97 +323,198 @@
             - fonts-noto-unhinted 
             - fonts-hanazono 
             - ttf-unifont
+            
+      - name: git noto emoji
+        git:
+          dest: /home/ubuntu/src/noto-emoji
+          clone: yes
+          repo: 'https://github.com/googlei18n/noto-emoji.git'
+       
+      - name: git noto font
+        git:
+          dest: /home/ubuntu/src/noto-fonts
+          clone: yes
+          repo: 'https://github.com/googlei18n/noto-fonts.git'
 
       # Install the fonts needed by openstreetmap-carto
-      - synchronize:
-          src: /noto-emoji/fonts/NotoColorEmoji.ttf
+      - copy:
+          src: /home/ubuntu/src/noto-emoji/fonts/NotoColorEmoji.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-emoji/fonts/NotoEmoji-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-emoji/fonts/NotoEmoji-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoNaskhArabicUI-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoNaskhArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoNaskhArabicUI-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoNaskhArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansAdlam-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansAdlam-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansAdlamUnjoined-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansAdlamUnjoined-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansChakma-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansChakma-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansOsage-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansOsage-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansSinhalaUI-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSinhalaUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansCherokee-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansCherokee-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansSinhalaUI-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSinhalaUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansSymbols-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansSymbols-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/hinted/NotoSansArabicUI-Bold.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - synchronize:
-          src: /noto-fonts/unhinted/NotoSansSymbols2-Regular.ttf
+        become: yes
+      - copy:
+          src: /home/ubuntu/src/noto-fonts/unhinted/NotoSansSymbols2-Regular.ttf
           dest: /usr/share/fonts/truetype/noto
-        delegate_to: "{{ inventory_hostname }}"
-      - name: fc-cache
-        command: sudo fc-cache -fv
+        become: yes
 
-      #Install git
-      - name: Install git
+      - name: Install fontconfig
         become: yes
         apt:
           name: fontconfig
           state: latest
 
-      #Create the data folder
-      - name: Creates directory
-        file: path=/src state=directory
+      - name: fc-list
+        shell: fc-list
+        
+      # Install old unifont Medium font (just removes the warning)
+      - name: make directory
+        file: 
+          path: /home/ubuntu/src/OldUnifont 
+          state: directory
+            
+      - name: get debian
+        get_url: 
+          url: http://http.debian.net/debian/pool/main/u/unifont/unifont_5.1.20080914.orig.tar.gz
+          dest: /home/ubuntu/src/OldUnifont
+      
+      - name: unzipping file
+        shell: tar xvfz unifont_5.1.20080914.orig.tar.gz unifont-5.1.20080914/font/precompiled/unifont.ttf
+        args:
+          chdir: /home/ubuntu/src/OldUnifont
+          warn: no
+            
+      - name: copying file
+        become: yes
+        copy:
+          src: /home/ubuntu/src/OldUnifont/unifont-5.1.20080914/font/precompiled/unifont.ttf
+          dest: /usr/share/fonts/truetype/unifont/OldUnifont.ttf
 
+      # Create the data folder get-shapefiles.pys
       - name: Run script
-        command: scripts/get-shapefiles.py
-          chdir: src/openstreetmap-carto
-
-
+        shell: scripts/get-shapefiles.py
+        args:
+          chdir: /home/ubuntu/src/openstreetmap-carto
+          
+      - name: Download Node.js setup script
+        shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && sudo apt-get install -y nodejs
+        args:
+          warn: no
+            
+      - name: install node.js
+        become: yes
+        apt: 
+          name: npm
+          state: latest
+      
+      # Install the latest version 0 of carto
+      - name: install lest verion 0 of carto
+        become: yes
+        shell: npm install -g carto@0
+        
+      # Install mapnik-reference
+      - name: install mapnik
+        shell: npm install mapnik-reference
+        args:
+          chdir: /home/ubuntu/src/openstreetmap-carto
+            
+      - name: install mapnik
+        shell: node -e "console.log(require('mapnik-reference'))"
+        args:
+          chdir: /home/ubuntu/src/openstreetmap-carto
+        
+      - name: test and produce carto
+        shell: carto -a "3.0.20" project.mml > style.xml
+        args:
+          chdir: /home/ubuntu/src/openstreetmap-carto
+        
+      - name: test
+        shell: ls -l /home/ubuntu/src/openstreetmap-carto/style.xml
+      
+      - name: Install PostgreSQL
+        become: yes
+        apt: 
+          name: "{{ item }}"
+          state: latest
+          update_cache: yes
+        with_items:
+          - postgresql
+          - postgis
+          - pgadmin3
+          - postgresql-contrib
+        
+      # Set the password for the postgres user
+      - name: create a file
+        copy:
+          content: 'localhost:5432:*:postgres:postgres_007%'
+          dest: /home/ubuntu/.pgpass
+          mode: 0600
+        
+      - name: trust
+        become: yes
+        shell: sed -i 's|peer|trust|' /etc/postgresql/10/main/pg_hba.conf
+        args:
+          warn: no
+            
+      - name: trust (2)
+        become: yes
+        shell: sed -i 's|md5|trust|' /etc/postgresql/10/main/pg_hba.conf
+        args:
+          warn: no
+            
       - name: restart postgresql
-        service: name=postgresql state=restarted
+        become: yes
+        service: 
+          name: postgresql 
+          state: restarted
       
       # ---------------- Moravy Part ----------------
       
@@ -372,11 +540,9 @@
           - postgis
 
       - name: Add a user and grant access to gis DB
-        # sudo_user: postgres
         postgresql_user:
           db: "{{ db_name }}"
           name: ubuntu
-          # password: postres_007%
           priv: ALL
        
       - name: Enabling remote access to PostgreSQL (1)
@@ -429,12 +595,9 @@
           name: osm2pgsql
           state: latest
           update_cache: yes
-
-      - name: cd to openstreetmap-carto
-        shell: cd ~/src/openstreetmap-carto
       
       - name: Get an OpenStreetMap data extract
-        get_url: url=https://raw.githubusercontent.com/Damming/MapData/master/Auckland.osm.pbf dest=~/src/openstreetmap-carto
+        get_url: url=https://raw.githubusercontent.com/Damming/MapData/master/Auckland.osm.pbf dest=/home/ubuntu/src/openstreetmap-carto
        
       # Load data to postgis
       - name: Load data to postgis(1)
@@ -446,7 +609,7 @@
       - name: Load data to postgis(2)
         shell: osm2pgsql -s -C 300 -c -G --hstore --style openstreetmap-carto.style --tag-transform-script openstreetmap-carto.lua -d gis -H localhost -U postgres Auckland.osm.pbf
         args:
-          chdir: ~/src/openstreetmap-carto
+          chdir: /home/ubuntu/src/openstreetmap-carto
       
       # Create indexes and grant users
       - name: indexes and grantuser
@@ -455,18 +618,18 @@
       - name: indexes
         shell: scripts/indexes.py | psql -U postgres -h localhost -d gis
         args:
-          chdir: ~/src/openstreetmap-carto
+          chdir: /home/ubuntu/src/openstreetmap-carto
        
       - name: grantuser(3)
-        get_url: url=https://raw.githubusercontent.com/openstreetmap/osm2pgsql/master/install-postgis-osm-user.sh dest=~/src/openstreetmap-carto
+        get_url: url=https://raw.githubusercontent.com/openstreetmap/osm2pgsql/master/install-postgis-osm-user.sh dest=/home/ubuntu/src/openstreetmap-carto
         
       - name: grantuser(4)
-        file:  dest=~/src/openstreetmap-carto/install-postgis-osm-user.sh mode=a+x
+        file:  dest=/home/ubuntu/src/openstreetmap-carto/install-postgis-osm-user.sh mode=a+x
        
       - name: grantuser(5)
         shell: ./install-postgis-osm-user.sh gis ubuntu
         args:
-          chdir: ~/src/openstreetmap-carto
+          chdir: /home/ubuntu/src/openstreetmap-carto
          
       # ---------------- Simon Part ----------------  
 
@@ -533,7 +696,7 @@
       - name: install renderd(1)
         become: yes
         copy:
-          src: ~/src/mod_tile/debian/renderd.init
+          src: /home/ubuntu/src/mod_tile/debian/renderd.init
           dest: /etc/init.d/renderd
           mode: a+x
 
@@ -597,18 +760,33 @@
         shell: ln -s /etc/apache2/mods-available/mod_tile.load /etc/apache2/mods-enabled/ warn=False
       
       # Edit The default virtual host file
-      - name: add more lines
+      # - name: add more lines
+      #   become: yes
+      #   lineinfile:
+      #     dest: /etc/apache2/sites-enabled/000-default.conf
+      #     insertafter: '<VirtualHost *:80>'
+      #     state: present
+      #     line: "{{ item }}"
+      #   with_items:
+      #     - '        LoadTileConfigFile /usr/local/etc/renderd.conf'
+      #     - '        ModTileRenderdSocketName /var/run/renderd/renderd.sock'
+      #     - '        ModTileRequestTimeout 3'
+      #     - '        ModTileMissingRequestTimeout 60'
+      - name: Edit host file(1)
         become: yes
-        lineinfile:
-          dest: /etc/apache2/sites-enabled/000-default.conf
-          insertafter: <VirtualHost *:80>
-          state: present
-          line: "{{ item }}"
-        with_items:
-          - '        LoadTileConfigFile /usr/local/etc/renderd.conf'
-          - '        ModTileRenderdSocketName /var/run/renderd/renderd.sock'
-          - '        ModTileRequestTimeout 3'
-          - '        ModTileMissingRequestTimeout 60'
+        shell: sed -i "2i\        LoadTileConfigFile /usr/local/etc/renderd.conf" /etc/apache2/sites-enabled/000-default.conf
+      
+      - name: Edit host file(2)
+        become: yes
+        shell: sed -i '3i\        ModTileRenderdSocketName /var/run/renderd/renderd.sock' /etc/apache2/sites-enabled/000-default.conf
+      
+      - name: Edit host file(3)
+        become: yes
+        shell: sed -i '4i\        ModTileRequestTimeout 3' /etc/apache2/sites-enabled/000-default.conf
+      
+      - name: Edit host file(4)
+        become: yes
+        shell: sed -i '5i\        ModTileMissingRequestTimeout 60' /etc/apache2/sites-enabled/000-default.conf
         
       # - name: restart apache2
       #   script: systemctl restart apache2
@@ -630,4 +808,3 @@
       
       - name: Start renderd
         shell: renderd -f -c /usr/local/etc/renderd.conf
-            
