@@ -450,16 +450,16 @@
         args:
           chdir: /home/ubuntu/src/OldUnifont
           warn: no
-      
-      - name: make directory(2)
-        file: 
-          path: /usr/share/fonts/truetype/unifont
-          state: directory
+
+      # - name: make directory(2)
+      #   file: 
+      #     path: /usr/share/fonts/truetype/unifont
+      #     state: directory
             
       - name: copying file
-        remote_src: yes
         become: yes
         copy:
+          remote_src: yes
           src: /home/ubuntu/src/OldUnifont/unifont-5.1.20080914/font/precompiled/unifont.ttf
           dest: /usr/share/fonts/truetype/unifont/OldUnifont.ttf
 
@@ -719,9 +719,9 @@
 
       # # Install renderd init script by copying the sample init script included in its package
       - name: install renderd(1)
-        remote_src: yes
         become: yes
         copy:
+          remote_src: yes
           src: /home/ubuntu/src/mod_tile/debian/renderd.init
           dest: /etc/init.d/renderd
           mode: a+x
