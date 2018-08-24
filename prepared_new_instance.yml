@@ -122,7 +122,7 @@
       - name: Refresh hosts file
         meta: refresh_inventory
 
-      - wait_for: delay=10
+      - wait_for: delay=5
 
   - name: install openstreetmap
     hosts: webserver
@@ -157,6 +157,7 @@
             - build-essential
             - clang
             - python-psycopg2
+            - python3-psycopg2
       
       # ---------------- Yaozu Part ----------------
 
@@ -236,7 +237,7 @@
             - apache2 
             - apache2-dev
 
-      # Install Mod_tile from source #########CHANGE###########
+      # Install Mod_tile from source
       - name: Install necessary packages
         become: yes
         apt: 
@@ -305,8 +306,7 @@
             - python-pip
             - mapnik-utils
 
-      # Install openstreetmap-carto
-      - name: git openstreetmap-carto
+      - name: Install openstreetmap-carto
         git:
           repo: 'https://github.com/gravitystorm/openstreetmap-carto.git'
           clone: yes
@@ -450,11 +450,6 @@
         args:
           chdir: /home/ubuntu/src/OldUnifont
           warn: no
-
-      # - name: make directory(2)
-      #   file: 
-      #     path: /usr/share/fonts/truetype/unifont
-      #     state: directory
             
       - name: copying file
         become: yes
@@ -463,7 +458,7 @@
           src: /home/ubuntu/src/OldUnifont/unifont-5.1.20080914/font/precompiled/unifont.ttf
           dest: /usr/share/fonts/truetype/unifont/OldUnifont.ttf
 
-      # Create the data folder get-shapefiles.pys
+      # Create the data folder
       - name: Run script
         shell: scripts/get-shapefiles.py
         args:
@@ -480,7 +475,6 @@
           name: npm
           state: latest
       
-      # Install the latest version 0 of carto
       - name: install lest verion 0 of carto
         become: yes
         shell: npm install -g carto@0
@@ -491,7 +485,7 @@
         args:
           chdir: /home/ubuntu/src/openstreetmap-carto
             
-      - name: install mapnik
+      - name: install mapnik (2)
         shell: node -e "console.log(require('mapnik-reference'))"
         args:
           chdir: /home/ubuntu/src/openstreetmap-carto
@@ -561,8 +555,8 @@
       - name: hstore extension
         command: psql -U postgres -h localhost -d gis -c "CREATE EXTENSION {{ item }}"
         with_items:
-          - hstore
           - postgis
+          - hstore
 
       - name: Add a user and grant access to gis DB
         postgresql_user:
@@ -601,6 +595,14 @@
           - 'maintenance_work_mem= 64MB'
           - 'autovacuum = off'
           - 'fsync = off'
+
+      - name: stop postgresql
+        become: yes
+        shell: /etc/init.d/postgresql stop
+
+      - name: start postgresql
+        become: yes
+        shell: /etc/init.d/postgresql start
       
       # Install Osm2pgsql
       - name: add repository
@@ -610,9 +612,10 @@
           update-cache: yes
               
       - name: add a key
-        apt_key:
-          keyserver: keyserver.ubuntu.com
-          id: A438A16C88C6BE41CB1616B8D57F48750AC4F2CB
+        shell: apt-key adv --keyserver keyserver.ubuntu.com --recv A438A16C88C6BE41CB1616B8D57F48750AC4F2CB
+        # apt_key:
+        #   keyserver: keyserver.ubuntu.com
+        #   id: A438A16C88C6BE41CB1616B8D57F48750AC4F2CB
           
       - name: install osm
         become: yes
@@ -729,15 +732,15 @@
       # Edit the init script file
       - name: Edit script(1)
         become: yes
-        shell: sed -i -e '/DAEMON=/ s~=.*~= /usr/local/bin/$NAME~' /etc/init.d/renderd
+        shell: sed -i -e '/DAEMON=/ s~=.*~= /usr/local/bin/$NAME~' /etc/init.d/renderd warn=False
             
       - name: Edit script(2)
         become: yes
-        shell: sed -i -e '/DAEMON_ARGS=/ s~=.*~= "-c /usr/local/etc/renderd.conf"~' /etc/init.d/renderd
+        shell: sed -i -e '/DAEMON_ARGS=/ s~=.*~= "-c /usr/local/etc/renderd.conf"~' /etc/init.d/renderd warn=False
             
       - name: Edit script(3)
         become: yes
-        shell: sed -i -e '/RUNASUSER=/ s~=.*~=ubuntu~' /etc/init.d/renderd
+        shell: sed -i -e '/RUNASUSER=/ s~=.*~=ubuntu~' /etc/init.d/renderd warn=False
 
       # Create directories for renderd and mod_tile
       - name: creates directory for renderd
@@ -767,6 +770,8 @@
         shell: systemctl enable renderd
       
       # ---------------- Moravy Part Again ---------------- 
+
+
 
       # Configure Apache
       - name: create file and write into item
