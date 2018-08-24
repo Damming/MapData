@@ -127,7 +127,7 @@
     remote_user: ubuntu
     gather_facts: True
     become_user: root
-    become: yes
+    become: true
     tags: provisioning
 
     vars:
